@@ -5,18 +5,10 @@
   "channel_set": [],
   //run with Aretes or Sheng's setting? 0: Aretes, 1: Sheng
   "study_mode": 0,
-  //make test features?
-  "make_test": 1,
-  //path to test data location
-  "test": "/Volumes/Samsung_T5/seizure_data/Pat1Test",
-  //make train features?
-  "make_train": 1,
-  //path to train data location
-  "train": "/Volumes/Samsung_T5/seizure_data/Pat3Test",
-  //make a hold-out feature set?
-  "make_hold": 0,
-  //path to hold-out data location
-  "hold-out": "/",
+  //data mode? 0: test, 1: train
+  "data_mode": "train",
+  //path to  data location
+  "path": "/Volumes/Samsung_T5/seizure_data/Pat3Test",
   //path to trained model location
   "model": "/Volumes/Samsung_T5/seizure_data/Pat1Model",
   //path to generated features location

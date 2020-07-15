@@ -42,7 +42,7 @@ def short_features(pat, outfile, datapath, channelSet):
             if os.path.basename(ff[i]) == "1_45_1.mat":
                 continue
             data = data_full[
-                :, j * int(rate * 60 / 2) : (j) * int(rate * 60 / 2) + int(rate) * 60
+                :, j * int(rate * 60 / 2) : (j) * int(rate * 60 / 2) + int(rate) * 60,
             ]
             data = preprocessing.scale(data, axis=1, with_std=True)
 
@@ -56,7 +56,9 @@ def short_features(pat, outfile, datapath, channelSet):
                     output.append(psd[(f > bands[c - 1]) & (f < bands[c])].sum())
         mydata.append(pd.DataFrame({"Features": output}, index=featureList).T)
     trainSample = pd.concat(mydata, ignore_index=True)
-    trainSample.to_csv(outfile)
+
+    new_outfile = outfile[:-4] + "_" + str(c) + "_short.csv"
+    trainSample.to_csv(new_outfile)
     return 1
 
 
@@ -68,27 +70,26 @@ def long_features(pat, outfile, datapath, channelSet, studyMode):
     ff = glob.glob(f)
 
     label = [str(os.path.basename(n)) for n in ff]
-    print(label)
 
     output = []
     featureList = []
 
     bands = [0.1, 4, 8, 12, 30, 70]
+    mydata = []
 
-    for j in channelSet:
+    for i in range(len(ff)):
+        output = []
+        featureList = []
+        if os.path.basename(ff[i]) == "1_45_1.mat":
+            continue
+        data = get_data(ff[i])
+        data = preprocessing.scale(data, axis=1, with_std=True)
+        featureList.append("File")
+        output.append(label[i])
+        featureList.append("pat")
+        output.append(pat_num)
 
-        mydata = []
-        for i in range(len(ff)):
-            output = []
-            featureList = []
-            if os.path.basename(ff[i]) == "1_45_1.mat":
-                continue
-            data = get_data(ff[i])
-            data = preprocessing.scale(data, axis=1, with_std=True)
-            featureList.append("File")
-            output.append(label[i])
-            featureList.append("pat")
-            output.append(pat_num)
+        for j in channelSet:
 
             hold = spsig.decimate(data[j, :], 5, zero_phase=True)
 
@@ -149,19 +150,34 @@ def long_features(pat, outfile, datapath, channelSet, studyMode):
                     -1.0 * np.sum(psd[f > bands[0]] * np.log10(psd[f > bands[0]]))
                 )
 
-            mydata.append(pd.DataFrame({"Features": output}, index=featureList).T)
+    mydata.append(pd.DataFrame({"Features": output}, index=featureList).T)
 
-            trainSample = pd.concat(mydata, ignore_index=True)
+    trainSample = pd.concat(mydata, ignore_index=True)
 
-        new_outfile = outfile[:-4] + "_" + str(j) + ".csv"
-        trainSample.to_csv(new_outfile)
+    new_outfile = outfile[:-4] + "_" + str(j) + "_long.csv"
+    trainSample.to_csv(new_outfile)
 
     return 1
 
 
 # Main function
 def main():
-    pass
+    feat = json.load(open("SETTINGS.json"))
+    pat = feat["pat"]
+    study_mode = feat["study_mode"]
+    if feat["channel_set"].length == 0:
+        channel_set = [i for i in range(16)]
+    else:
+        channel_set = feat["channel_set"]
+
+    outfile = "/Volumes/Samsung_T5/seizure_data/feature_data/{}_pat_{}_study_{}.csv".format(
+        feat["data_mode"], pat, study_mode
+    )
+
+    long_features(pat, outfile, feat["path"], study_mode, channel_set)
+
+    if study_mode == 0:
+        short_features(pat, outfile, feat["path"], channel_set)
 
 
 if __name__ == "__main__":

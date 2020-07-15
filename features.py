@@ -38,7 +38,6 @@ def long_features(pat, outfile, datapath, timer):
 
         mydata = []
         for i in range(len(ff)):
-            # print(float(i)/float(len(ff)))
             output = []
             outputtimer = []
             featureList = []
@@ -46,7 +45,6 @@ def long_features(pat, outfile, datapath, timer):
             if os.path.basename(ff[i]) == '1_45_1.mat':
                 continue
             data = get_data(ff[i])
-            # print(data)
             data = preprocessing.scale(data, axis=1, with_std=True)
             featureList.append('File')
             # featureListimer.append('File')
