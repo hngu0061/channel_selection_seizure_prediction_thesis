@@ -1,16 +1,9 @@
 {
-  //patient number
   "pat": 1,
-  //selected channel to investigate. Leave empty if you want to select all channel
-  "channel_set": [],
-  //run with Aretes or Sheng's setting? 0: Aretes, 1: Sheng
+  "channel_set": [8],
   "study_mode": 0,
-  //data mode? 0: test, 1: train
   "data_mode": "train",
-  //path to  data location
-  "path": "/Volumes/Samsung_T5/seizure_data/Pat3Test",
-  //path to trained model location
+  "path": "/Volumes/Samsung_T5/seizure_data/Pat1Train",
   "model": "/Volumes/Samsung_T5/seizure_data/Pat1Model",
-  //path to generated features location
   "feat": "/Volumes/Samsung_T5/seizure_data/Pat1Model"
 }

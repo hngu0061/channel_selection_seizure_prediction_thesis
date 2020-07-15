@@ -24,6 +24,10 @@ def short_features(pat, outfile, datapath, channelSet):
     ff = glob.glob(f)
 
     label = [str(os.path.basename(n)) for n in ff]
+    channel_str = ""
+    for channel in channelSet:
+        channel_str += "{}-".format(channel + 1)
+    channel_str = channel_str.rstrip("-")
     output = []
     featureList = []
     mydata = []
@@ -54,10 +58,11 @@ def short_features(pat, outfile, datapath, channelSet):
                 for c in range(1, len(bands)):
                     featureList.append("BandEnergy_%i_%i_%i" % (j, k, c))
                     output.append(psd[(f > bands[c - 1]) & (f < bands[c])].sum())
-        mydata.append(pd.DataFrame({"Features": output}, index=featureList).T)
-    trainSample = pd.concat(mydata, ignore_index=True)
 
-    new_outfile = outfile[:-4] + "_" + str(c) + "_short.csv"
+        mydata.append(pd.DataFrame({"Features": output}, index=featureList).T)
+        trainSample = pd.concat(mydata, ignore_index=True)
+
+    new_outfile = outfile[:-4] + "_channel_{}_short.csv".format(channel_str)
     trainSample.to_csv(new_outfile)
     return 1
 
@@ -70,7 +75,10 @@ def long_features(pat, outfile, datapath, channelSet, studyMode):
     ff = glob.glob(f)
 
     label = [str(os.path.basename(n)) for n in ff]
-
+    channel_str = ""
+    for channel in channelSet:
+        channel_str += "{}-".format(channel + 1)
+    channel_str = channel_str.rstrip("-")
     output = []
     featureList = []
 
@@ -78,6 +86,7 @@ def long_features(pat, outfile, datapath, channelSet, studyMode):
     mydata = []
 
     for i in range(len(ff)):
+        print("Running file number {}".format(i))
         output = []
         featureList = []
         if os.path.basename(ff[i]) == "1_45_1.mat":
@@ -150,11 +159,10 @@ def long_features(pat, outfile, datapath, channelSet, studyMode):
                     -1.0 * np.sum(psd[f > bands[0]] * np.log10(psd[f > bands[0]]))
                 )
 
-    mydata.append(pd.DataFrame({"Features": output}, index=featureList).T)
+        mydata.append(pd.DataFrame({"Features": output}, index=featureList).T)
+        trainSample = pd.concat(mydata, ignore_index=True)
 
-    trainSample = pd.concat(mydata, ignore_index=True)
-
-    new_outfile = outfile[:-4] + "_" + str(j) + "_long.csv"
+    new_outfile = outfile[:-4] + "_channel_{}_long.csv".format(channel_str)
     trainSample.to_csv(new_outfile)
 
     return 1
@@ -165,7 +173,7 @@ def main():
     feat = json.load(open("SETTINGS.json"))
     pat = feat["pat"]
     study_mode = feat["study_mode"]
-    if feat["channel_set"].length == 0:
+    if len(feat["channel_set"]) == 0:
         channel_set = [i for i in range(16)]
     else:
         channel_set = feat["channel_set"]
@@ -174,7 +182,7 @@ def main():
         feat["data_mode"], pat, study_mode
     )
 
-    long_features(pat, outfile, feat["path"], study_mode, channel_set)
+    long_features(pat, outfile, feat["path"], channel_set, study_mode)
 
     if study_mode == 0:
         short_features(pat, outfile, feat["path"], channel_set)
