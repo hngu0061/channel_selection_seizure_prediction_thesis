@@ -1,9 +1,12 @@
 {
-  "pat": 1,
-  "channel_set": [8],
+  "pat": 3,
+  "channel_set": [],
   "study_mode": 0,
-  "data_mode": "train",
-  "path": "/Volumes/Samsung_T5/seizure_data/Pat1Train",
+  "data_mode": "test",
+  "path": "/Volumes/Samsung_T5/seizure_data/Pat3Test",
   "model": "/Volumes/Samsung_T5/seizure_data/Pat1Model",
-  "feat": "/Volumes/Samsung_T5/seizure_data/Pat1Model"
+  "feat": "/Volumes/Samsung_T5/seizure_data/Pat1Model",
+  "ordered_channel": [],
+  "feature_path": "/Volumes/Samsung_T5/seizure_data/feature_data/concat_files/",
+  "classifier": "RandomForest"
 }

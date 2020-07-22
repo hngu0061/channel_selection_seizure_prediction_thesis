@@ -98,6 +98,24 @@ def long_features(pat, outfile, datapath, channelSet, studyMode):
         featureList.append("pat")
         output.append(pat_num)
 
+        if len(channelSet) == 16:
+            # get correlation Coef. this will be 16x16
+            h = np.corrcoef(data)
+            h = np.nan_to_num(h)
+            # only want upper triangle
+            ind = np.triu_indices(16, 1)
+            htri = h[ind]
+            for ii in range(np.size(htri)):
+                featureList.append("coef%i" % (ii))
+                output.append(htri[ii])
+
+            c, v = np.linalg.eig(h)
+            c.sort()
+            c = np.real(c)
+            for e in range(len(c)):
+                featureList.append("coef_timeEig%i" % (e))
+                output.append(c[e])
+
         for j in channelSet:
 
             hold = spsig.decimate(data[j, :], 5, zero_phase=True)
@@ -178,14 +196,14 @@ def main():
     else:
         channel_set = feat["channel_set"]
 
-    outfile = "/Volumes/Samsung_T5/seizure_data/feature_data/{}_pat_{}_study_{}.csv".format(
+    outfile = "/Volumes/Samsung_T5/seizure_data/feature_data/{}_pat_{}_study_{}_modified.csv".format(
         feat["data_mode"], pat, study_mode
     )
 
     long_features(pat, outfile, feat["path"], channel_set, study_mode)
 
-    if study_mode == 0:
-        short_features(pat, outfile, feat["path"], channel_set)
+    # if study_mode == 0:
+    #     short_features(pat, outfile, feat["path"], channel_set)
 
 
 if __name__ == "__main__":
